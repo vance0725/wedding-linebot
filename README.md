@@ -21,10 +21,10 @@
 # 事前準備
 
 1. 到[LINE Developers](https://developers.line.biz/zh-hant/)建立一個line官方帳號
-2. 一個google帳號
-需開通GCP
-需開通Google Oauth
-需開通Google Photo API
+2. 一個google帳號 \
+需開通GCP \
+需開通Google Oauth \
+需開通Google Photo API \
 (詳細可以參考[這篇](https://www.wfublog.com/2019/12/google-apps-script-google-photo-api-upload.html) OR [這篇](https://salu099.github.io/blog/2018/06/csharp-google-photos-api/))
 3. GCP上需安裝[imagemagick](https://imagemagick.org/)
 
@@ -42,25 +42,25 @@ line有提供[maven SDK](https://mvnrepository.com/artifact/com.linecorp.bot/lin
 
 4. 個人覺得Google Photo的Java API有看沒有懂，最後都採用restful api的方式呼叫，也比較直覺
 
-5. imagemagick java套件
-其實可以透過im4java的套件，來呼叫linux主機上的imagemagick指令。
+5. imagemagick java套件 \
+其實可以透過im4java的套件，來呼叫linux主機上的imagemagick指令。\
 但因爲當下找不到像下面固定高度的指令，只好用Java Process呼叫了...@@
 
     convert -quality 80 -resize x1080 original/test.jpg test-c.jpg
 
-6. 需先寫好shell，便於執行imagemagick
+6. 需先寫好shell，便於執行imagemagick \
 不寫的話也ok啦
 
-7. 文字篩選功能
+7. 文字篩選功能 \
 需另外放在linux上，還要在properties檔案內的textfile.path寫好位置
 比較好的做法應該是存在DB，然後放在cache中
 
-8. 程式入口點
-MessageServiceImpl.java -> line訊息
+8. 程式入口點 \
+MessageServiceImpl.java -> line訊息 \
 MainController.java -> Web UI / API
 
-9. 沒有登入機制
-~~我就懶👍~~
+9. 沒有登入機制 \
+~~我就懶👍~~ \
 結婚前一個月才想到做這個，又覺得只有自己會用，就沒做了哈哈哈
 
 
