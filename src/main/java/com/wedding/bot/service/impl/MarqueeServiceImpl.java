@@ -13,11 +13,16 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import com.wedding.bot.model.BadwordCh;
+import com.wedding.bot.model.BadwordEn;
 import com.wedding.bot.model.LineProfile;
 import com.wedding.bot.model.Marquee;
+import com.wedding.bot.repo.BadwordChRepo;
+import com.wedding.bot.repo.BadwordEnRepo;
 import com.wedding.bot.repo.MarqueeRepo;
 import com.wedding.bot.service.LineService;
 import com.wedding.bot.service.MarqueeService;
@@ -38,6 +43,10 @@ public class MarqueeServiceImpl implements MarqueeService {
 	private LineService lineService;
 	@Autowired
 	private MarqueeRepo marqueeRepo;
+	@Autowired
+	private BadwordChRepo badwordChRepo;
+	@Autowired
+	private BadwordEnRepo badwordEnRepo;
 	
 	public void addMarquee(String userId, String messageId, String message, boolean isValid) {
 		LineProfile lineProfile = lineService.getLineUserProfile(userId);
@@ -109,8 +118,8 @@ public class MarqueeServiceImpl implements MarqueeService {
 		}
 		
 		try {
-			List<String> chList = Files.lines(Paths.get(textFilePath + "badwords_zh_TW.txt")).collect(Collectors.toList());
-			List<String> enList = Files.lines(Paths.get(textFilePath + "badwords_en_US.txt")).collect(Collectors.toList());
+			List<String> chList = getBadwordCh().stream().map(o -> o.getWord()).collect(Collectors.toList());
+			List<String> enList = getBadwordEn().stream().map(o -> o.getWord()).collect(Collectors.toList());
 			
 			boolean isValid = true;
 			log.info("doing input: {}", input);
@@ -145,10 +154,20 @@ public class MarqueeServiceImpl implements MarqueeService {
 				}
 			}
 			return isValid;
-		} catch (IOException e) {
+		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 			return false;
 		}
+	}
+	
+	@Cacheable(value = "BadwordChCache")
+	public List<BadwordCh> getBadwordCh() {
+		return badwordChRepo.findAll();
+	}
+	
+	@Cacheable(value = "BadwordEnCache")
+	public List<BadwordEn> getBadwordEn() {
+		return badwordEnRepo.findAll();
 	}
 	
 	private String getDefaultMessage() {

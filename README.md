@@ -52,8 +52,7 @@ line有提供[maven SDK](https://mvnrepository.com/artifact/com.linecorp.bot/lin
 不寫的話也ok啦
 
 7. 文字篩選功能 \
-需另外放在linux上，還要在properties檔案內的textfile.path寫好位置
-比較好的做法應該是存在DB，然後放在cache中
+詞庫是參考[這裡](https://github.com/lyenliang/Profanity-Filter)
 
 8. 程式入口點 \
 MessageServiceImpl.java -> line訊息 \
