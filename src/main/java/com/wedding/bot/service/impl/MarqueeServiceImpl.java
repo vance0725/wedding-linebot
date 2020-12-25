@@ -32,8 +32,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class MarqueeServiceImpl implements MarqueeService {
 	
-	@Value("${textfile.path}")
-	private String textFilePath;
 	@Value("${marquee.message.length}")
 	private int marqueeLength;
 	@Value("${marquee.default.icon}")
