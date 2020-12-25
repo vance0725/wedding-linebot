@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="zh_TW" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="description" content="">
+<meta name="author" content="">
+<title>資料送出成功!</title>
+<link
+	href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css"
+	rel="stylesheet"
+	integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M"
+	crossorigin="anonymous">
+<link
+	href="https://getbootstrap.com/docs/4.0/examples/signin/signin.css"
+	rel="stylesheet" crossorigin="anonymous" />
+<style type="text/css">
+body {
+	font-family: 微軟正黑體, sans-serif;
+}
+</style>
+</head>
+<body>
+	<div class="container">
+		<h1>資料送出成功!</h1>
+		<br/>
+		<br/>
+		<div id="countdown">將在&nbsp;5&nbsp;秒後自動轉導到選擇頁</div>
+		<div>或點按<a th:href="${actionUrl}">這裡</a>快速跳到選擇頁</div>
+	</div>
+	
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+	<script th:inline="javascript">
+		var timeleft = 4;
+		var url = [[${actionUrl}]];
+		var downloadTimer = setInterval(function() {
+			if (timeleft <= 0) {
+				clearInterval(downloadTimer);
+				window.location.href = url;
+			} else {
+				var str = "將在&nbsp;" + timeleft + "&nbsp;秒後自動轉導到選擇頁";
+				$("#countdown").html(str);
+			}
+			timeleft -= 1;
+		}, 1000);
+	</script>
+</body>
+</html>

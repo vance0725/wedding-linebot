@@ -1,0 +1,86 @@
+<!doctype html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<header>
+	<meta charset="utf-8" />
+	<link
+	href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css"
+	rel="stylesheet"
+	integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M"
+	crossorigin="anonymous">
+	<link
+	href="https://getbootstrap.com/docs/4.0/examples/signin/signin.css"
+	rel="stylesheet" crossorigin="anonymous" />
+	<style type="text/css">
+	body {
+		font-family: 微軟正黑體, sans-serif;
+	}
+	</style>
+	<link href="//cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css" rel="stylesheet" />
+	<title>PIC SELECT</title>
+</header>
+<body>
+	<div class="container">
+		<h1 class="text-center">
+			<strong>PIC SELECT</strong>
+		</h1>
+		<h6>
+			<ol>
+				<li>不論點擊框框、編號或圖片，皆可以選擇，以框框內的V為準</li>
+				<li>限制一次只顯示10筆結果，待此頁內容送出後，才會再顯示其他圖片</li>
+			</ol>
+		</h6>
+		<hr />
+		<form role="form" id="select_pics" enctype="multipart/form-data">
+			<table class="table table-hover" id="select_pics_table">
+				<thead>
+					<tr>
+						<td>選擇</td>
+						<td>No.</td>
+						<td>圖片</td>
+					</tr>
+				</thead>
+				<tbody>
+					<tr th:each="list : ${list}" class="item_select">
+						<td><input type="checkbox" name="itemSelect[]"
+							th:id="${'item_' + (listStat.index+1)}"
+							th:value="${list.messageId}" checked /></td>
+						<td th:text="${listStat.index+1}"></td>
+						<td><img th:src="'/showpic/' + ${list.messageId}" width="30%" loading="lazy" /></td>
+					</tr>
+				</tbody>
+			</table>
+			<button type="submit" id="submit-btn" class="btn btn-primary btn-block btn-lg">送出</button>
+		</form>
+	</div>
+	<!--container-->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+	<script src="//cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
+	<script th:inline="javascript">
+		$(function() {
+			$('#select_pics_table').DataTable({
+				searching: false,
+				paging: false,
+				autoWidth: false,
+				columnDefs: [
+		            { width: "10%", targets: 0 },
+		            { width: "10%", targets: 1 },
+		            { width: "80%", targets: 2 }
+		        ]
+			});
+			
+			$('.item_select').click(function(event) {
+          		if (event.target.type !== 'checkbox') {
+              		$(':checkbox', this).trigger('click');
+          		}
+      		});
+			
+      		$("#submit-btn").click(function() {
+				var url = [[${actionUrl}]];
+				$("#select_pics").attr("action", url).attr("method", "POST").submit();
+			});
+  		});
+	</script>
+</body>
+</html>

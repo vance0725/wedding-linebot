@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>loading...</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+	<div>
+		<p>loading...</p>
+	</div>
+	<div>
+		<img src="https://media.giphy.com/media/l0HlUIl8snxmgscE0/giphy.gif" />
+	</div>
+	<script th:inline="javascript">
+		async function sleep(ms = 0) {
+			return new Promise(r => setTimeout(r, ms));
+		}    
+	
+		async function loading() {
+        	var URL = [[${url}]];
+        	await sleep(10000);
+            window.location.href = URL;
+        }
+		
+        window.load = loading();
+    </script>
+</body>
+</html>
