@@ -19,7 +19,10 @@ import com.linecorp.bot.model.event.message.ImageMessageContent;
 import com.linecorp.bot.model.event.message.LocationMessageContent;
 import com.linecorp.bot.model.event.message.TextMessageContent;
 import com.linecorp.bot.model.event.message.VideoMessageContent;
+import com.wedding.bot.model.Button;
+import com.wedding.bot.model.LineProfile;
 import com.wedding.bot.model.Pic;
+import com.wedding.bot.repo.ButtonRepo;
 import com.wedding.bot.repo.PicRepo;
 import com.wedding.bot.service.LineService;
 import com.wedding.bot.service.MarqueeService;
@@ -36,6 +39,8 @@ public class MessageServiceImpl implements MessageService {
 	private static final String IMAGE_TYPE = "image";
 	private static final String VIDEO_TYPE = "video";
 	
+	@Value("${line.bot.button}")
+	private String[] buttons;
 	@Value("${line.bot.accessToken}")
 	private String accessToken;
 	@Value("${line.bot.replyUrl}")
@@ -48,18 +53,20 @@ public class MessageServiceImpl implements MessageService {
 	private MarqueeService marqueeService;
 	@Autowired
 	private PicRepo picRepo;
+	@Autowired
+	private ButtonRepo buttonRepo;
 	
 	public void handleDefaultMsg(Event event) {
 		event.getSource().getUserId();
 	}
 	
 	public void handleTextMsg(MessageEvent<TextMessageContent> event) {
-		String[] escapeStr = {"傳遞祝福", "桌次圖", "交通", "婚紗照", "時間地點"};
 		String input = event.getMessage().getText();
 		boolean reply = true;
-		for (String s : escapeStr) {
+		for (String s : buttons) {
 			if (s.equals(input)) {
 				reply = false;
+				addButtonLog(input, event.getSource().getUserId());
 				break;
 			}
 		}
@@ -146,6 +153,18 @@ public class MessageServiceImpl implements MessageService {
 		} catch (IOException e) {
 			log.error("Message: {}", e.getMessage(), e);
 		}
+	}
+	
+	private void addButtonLog(String text, String userId) {
+		LineProfile profile = lineService.getLineUserProfile(userId);
+		
+		Button b = new Button();
+		b.setButtonText(text);
+		b.setUserId(userId);
+		b.setUserName(profile.getDisplayName());
+		b.setUserImage(profile.getPictureUrl());
+		b.setClickTime(new Date());
+		buttonRepo.save(b);
 	}
 	
 }
