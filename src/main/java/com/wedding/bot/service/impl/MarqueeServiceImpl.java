@@ -1,8 +1,5 @@
 package com.wedding.bot.service.impl;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -19,10 +16,12 @@ import org.springframework.util.StringUtils;
 
 import com.wedding.bot.model.BadwordCh;
 import com.wedding.bot.model.BadwordEn;
+import com.wedding.bot.model.DefaultMessage;
 import com.wedding.bot.model.LineProfile;
 import com.wedding.bot.model.Marquee;
 import com.wedding.bot.repo.BadwordChRepo;
 import com.wedding.bot.repo.BadwordEnRepo;
+import com.wedding.bot.repo.DefaultMessageRepo;
 import com.wedding.bot.repo.MarqueeRepo;
 import com.wedding.bot.service.LineService;
 import com.wedding.bot.service.MarqueeService;
@@ -47,6 +46,8 @@ public class MarqueeServiceImpl implements MarqueeService {
 	private BadwordChRepo badwordChRepo;
 	@Autowired
 	private BadwordEnRepo badwordEnRepo;
+	@Autowired
+	private DefaultMessageRepo defaultMessageRepo;
 	
 	public void addMarquee(String userId, String messageId, String message, boolean isValid) {
 		LineProfile lineProfile = lineService.getLineUserProfile(userId);
@@ -70,7 +71,7 @@ public class MarqueeServiceImpl implements MarqueeService {
 		if (yetShow.size() > 0) {
 			Marquee m = yetShow.get(0);
 			if (!m.getIsValid()) // 隨機抓賀詞
-				m.setMessage(getDefaultMessage());
+				m.setMessage(getDefaultMessageStr());
 			m.setPriority(false);
 			marqueeRepo.save(m); // 更新已優先露出的狀態
 			
@@ -170,11 +171,16 @@ public class MarqueeServiceImpl implements MarqueeService {
 		return badwordEnRepo.findAll();
 	}
 	
-	private String getDefaultMessage() {
+	@Cacheable(value = "DefaultMessageCache")
+	public List<DefaultMessage> getDefaultMessage() {
+		return defaultMessageRepo.findAll();
+	}
+	
+	private String getDefaultMessageStr() {
 		try {
-			List<String> messages = Files.lines(Paths.get(textFilePath + "defaultMessage.txt")).collect(Collectors.toList());
+			List<String> messages = getDefaultMessage().stream().map(o -> o.getWord()).collect(Collectors.toList());
 			return messages.get((int)(Math.random() * messages.size()));
-		} catch (IOException e) {
+		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 			return "恭喜老爺～賀喜夫人❤️";
 		}

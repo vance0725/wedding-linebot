@@ -30,4 +30,13 @@
 	   timeToLiveSeconds="86400"
 	   memoryStoreEvictionPolicy="LRU"/>
 	   
+	 <cache name="DefaultMessageCache"
+	   eternal="false"
+	   maxElementsInMemory="1000"
+	   overflowToDisk="false"
+	   diskPersistent="false"
+	   timeToIdleSeconds="0"
+	   timeToLiveSeconds="86400"
+	   memoryStoreEvictionPolicy="LRU"/>
+	   
 </ehcache>
