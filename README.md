@@ -1,8 +1,10 @@
 # 婚禮LineBot
 
-先前參加朋友的婚禮，看到他的問卷是用linebot寫的，覺得相當酷炫！但等到自己的婚禮時，卻沒有使用linebot發放問卷XD
-會有這個linebot，主要是覺得單純婚紗輪播好像有點無聊~當然還有自己想要多拿到賓客拍的照片XD
-以下是婚禮當天有用到的功能
+先前參加朋友的婚禮，看到他的問卷是用linebot寫的，覺得相當酷炫！ \
+但等到自己的婚禮時，卻沒有使用linebot發放問卷XD \
+會有這個linebot，主要是覺得單純婚紗輪播好像有點無聊~ \
+~~當然還有自己想要多拿到賓客拍的照片~~ 哈哈哈 \
+以下是婚禮當天有用到的功能:
 
 - user可以用line上傳照片&文字
 - 輪播user上傳的照片&文字
@@ -22,11 +24,11 @@
 
 1. 到[LINE Developers](https://developers.line.biz/zh-hant/)建立一個line官方帳號
 2. 一個google帳號 \
-需開通GCP \
+需開通GCP VM \
 需開通Google Oauth \
 需開通Google Photo API \
 (詳細可以參考[這篇](https://www.wfublog.com/2019/12/google-apps-script-google-photo-api-upload.html) OR [這篇](https://salu099.github.io/blog/2018/06/csharp-google-photos-api/))
-3. GCP上需安裝[imagemagick](https://imagemagick.org/)
+3. VM需安裝[imagemagick](https://imagemagick.org/)
 
 # 程式開發說明
 
@@ -49,7 +51,7 @@ line有提供[maven SDK](https://mvnrepository.com/artifact/com.linecorp.bot/lin
     convert -quality 80 -resize x1080 original/test.jpg test-c.jpg
 
 6. 需先寫好shell，便於執行imagemagick \
-不寫的話也ok啦
+shell可參考[compressPhoto.sh](https://github.com/vance0725/wedding-linebot/blob/main/compressPhoto.sh)
 
 7. 文字篩選功能 \
 詞庫是參考[這裡](https://github.com/lyenliang/Profanity-Filter)
@@ -62,8 +64,33 @@ MainController.java -> Web UI / API
 ~~我就懶👍~~ \
 結婚前一個月才想到做這個，又覺得只有自己會用，就沒做了哈哈哈
 
-
-# DEMO畫面
-
+10. 文字抽獎是抽全部的人，照片抽獎才有內定名單 \
+[randMarquee.html](https://github.com/vance0725/wedding-linebot/blob/main/src/main/resources/templates/pages/randMarquee.html)與[randPic.html](https://github.com/vance0725/wedding-linebot/blob/main/src/main/resources/templates/pages/randPic.html)的程式內都會用以下JS，去除已中獎名單(和內定名單綁一起)
+```
+unassignUser(username);
+```
 
 # 相關URL
+1. 編輯內定名單 \
+/select-user
+2. 篩選照片 \
+/select-pic
+3. 圖片&留言輪播 \
+/page/imageShow.html
+4. 文字抽獎 \
+/page/randMarquee.html
+5. 圖片抽獎 \
+/page/randPic.html
+
+# DEMO畫面
+1. line傳送留言或照片 \
+![image](https://raw.githubusercontent.com/vance0725/wedding-linebot/main/demo/line.JPG)
+2. 照片會自動上傳至google相簿中 \
+![image](https://raw.githubusercontent.com/vance0725/wedding-linebot/main/demo/image%20upload.PNG)
+3. 螢幕上會輪播賓客上傳的照片及留言(黃色圓圈是留言者的line大頭照) \
+![image](https://raw.githubusercontent.com/vance0725/wedding-linebot/main/demo/imageShow.png)
+4. 文字抽獎結果(賓客圖片替換成喜，實際是該留言者的line大頭照) \
+![image](https://raw.githubusercontent.com/vance0725/wedding-linebot/main/demo/randMarquee.png)
+5. 圖片抽獎結果 \
+![image](https://raw.githubusercontent.com/vance0725/wedding-linebot/main/demo/randPic.png)
+
