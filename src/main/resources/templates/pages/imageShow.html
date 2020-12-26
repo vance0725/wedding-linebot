@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1" />
+  <title>婚禮照片輪播</title>
+  <link rel="stylesheet" type="text/css" href="/css/barrager.css" />
+  <style>
+    html,
+    body {
+      margin: 0;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    body {
+      background-color: #111;
+    }
+
+    .pic {
+      height: 100vh;
+      width: 100vw;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    #pic-prepare {
+      display: none;
+    }
+
+    .pic {
+      display: block;
+      margin: auto;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="pic-area">
+  </div>
+
+  <!-- jQuery -->
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js" type="text/javascript"></script>
+  <script type="text/javascript" src="/js/jquery.barrager.js"></script>
+  <script type="text/javascript" src="/js/marquee.js"></script>
+  <script type="text/javascript">
+    var count = 0;
+    var showCount = 0;
+    var ajaxErrorCount = 0;
+    $(function () {
+      setImage();
+      setPicDisplay();
+      setMarquee();
+      console.log("count: " + count);
+      $("#img_" + showCount++).fadeIn(1000).removeClass("hidden").css("display", "block");
+      setImage(); // for preload image
+
+      setInterval(function () {
+        $("#img_" + showCount).fadeOut(1000).addClass("hidden");
+        console.log("fadeout showCount: "+showCount);
+        $("#img_" + ++showCount).fadeIn(1000).removeClass("hidden").css("display", "block");
+        console.log("fadein showCount: "+showCount);
+        console.log("count: " + count + ", showCount: " + showCount + ", time: " + Date.now() + ", picUrl: " + $("#img_" + showCount).attr("src"));
+        setImage(); // for preload image
+      }, 7000);
+
+      // 處理彈幕
+      setInterval(function () {
+        setMarquee();
+      }, 20000);
+    });
+
+    function setImage() {
+      $.ajax({
+        type: "get",
+        url: "/getImage",
+        success: function (response) {
+          if (response.length > 0) {
+            var obj = JSON.parse(response);
+            $("#pic-area").append("<img src='" + obj.publicUrl + "' id='img_" + ++count + "' class='pic hidden' />");
+            console.log("set img_" + count + ", picUrl: " + obj.publicUrl);
+            setPicDisplay();
+          }
+        }, error: function() {
+          console.log("ajax error! ajaxCount: " + ++ajaxErrorCount);
+          var randNum = rand(count, 1);
+          $("#pic-area").append("<img src='" + $("#img_" + randNum).attr("src") + "' id='img_" + ++count + "' class='pic hidden' />");
+          console.log("set img_" + count + ", picUrl: " + obj.publicUrl);
+          setPicDisplay();
+        }
+      });
+    }
+
+    function setMarquee() {
+      $.ajax({
+        type: "get",
+        url: "/getMarquee",
+        success: function (response) {
+          if (response.length > 0) {
+            var obj = JSON.parse(response);
+            marquee(obj.createUserImage, obj.message);
+          }
+        }, error: function() {
+          console.log("setMarquee ajax error!");
+          setMarquee();
+        }
+      });
+    }
+
+    function setPicDisplay() {
+      if ($(".pic").width > $(".pic").height) {
+        $(".pic").css("width", "100vw").css("height", "auto");
+      } else {
+        $(".pic").css("width", "auto").css("height", "100vh");
+      }
+    }
+
+    function rand(max, min) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <title>文字抽獎</title>
+    <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/normalize/7.0.0/normalize.min.css' />
+    <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css' />
+    <link rel="stylesheet" href="/css/rand.css">
+</head>
+
+<body>
+    <!--  背景圖  -->
+    <main class="full-block">
+        <table id="main-table">
+            <tr>
+                <td>
+                    <!--  主要內容  -->
+                    <div class="main-block">
+                        <div class="emoji">❤️</div>
+                        <!--  顯示區塊  -->
+                        <section class="god">
+                            <h1>
+                                <span class="wrap">
+                                    <span>？？？？？</span>
+                                </span>
+                            </h1>
+                        </section>
+
+                        <!--  按鈕  -->
+                        <section class="btns">
+                            <!--  start  -->
+                            <a class="btn-start" href="#">
+                                <span class="line top -h"></span>
+                                <span class="line right -v"></span>
+                                <span class="line bottom -h"></span>
+                                <span class="line left -v"></span>
+                            </a>
+                        </section>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td id="result">
+                    <!--  user area  -->
+                    <section id="user" class="user">
+                        <div></div>
+                    </section>
+                </td>
+            </tr>
+        </table>
+
+        <div id="user-template">
+            <table>
+                <tr class="user-img">
+                    <td><img class="circular" /></td>
+                    <td><img class="circular" /></td>
+                    <td><img class="circular" /></td>
+                </tr>
+                <tr class="user-name">
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr class="user-content">
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </table>
+        </div>
+
+        <img class="preload" id="preload1" />
+        <img class="preload" id="preload2" />
+        <img class="preload" id="preload3" />
+    </main>
+
+    <!-- jQuery -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js" type="text/javascript"></script>
+    <script src="/js/rand.js" type="text/javascript"></script>
+    <script type="text/javascript">
+        const duration = 3000; // 拉霸效果執行多久
+        var priceNum = 3; // 獎項數量
+        var priceArr = new Array(); // 已中獎user
+        $(function () {
+            var ajaxJson = null;
+            $.ajax({
+                type: "get",
+                async: false,
+                url: "/getLotteryMarquees/50",
+                success: function (response) {
+                    ajaxJson = JSON.parse(response);
+                    $(".btn-start").css("visibility", "visible").hide().fadeIn();
+                },
+                error: function () {
+                    location.reload();
+                }
+            });
+
+            // 設置獎項
+            for (var i = 0; i < ajaxJson.length; i++) {
+                $(".wrap").append("<span>" + ajaxJson[i].message + "</span>");
+            }
+
+            $(".btn-start").click(function () {
+                // 清空上一個抽獎結果
+                $("#user").html("<div></div>");
+
+                // 禁止按鈕再被點擊
+                $(this).addClass('not-allow');
+
+                // 加入動畫 class name
+                const list = document.querySelectorAll('.wrap > span');
+                Array.prototype.forEach.call(list, l => l.classList.add('span-' + (ajaxJson.length - 1)));
+
+                // 亂數決定中獎user
+                for (var i = 0; i < priceNum; i++) {
+                    processResult(ajaxJson, i);
+                }
+
+                $(".wrap span:first-child").html("-----");
+
+                // 移除動畫
+                setTimeout(() => {
+                    // 停止拉霸動畫
+                    Array.prototype.forEach.call(list, l => l.removeAttribute('class'));
+
+                    // 顯示抽中user資訊
+                    $("#user").html($("#user-template").html());
+
+                    $(".wrap span:first-child").html("恭喜中獎!!");
+
+                    // 恢復點選按鈕
+                    $(this).removeClass('not-allow').fadeOut();
+                }, duration);
+            });
+        });
+
+        function processResult(ajaxJson, i) {
+            var randNum = rand(ajaxJson.length - 1, 0);
+            console.log("randNum: " + randNum);
+            var selected = ajaxJson[randNum];
+            console.log(selected);
+            var username = selected.createUserName;
+            if (!priceArr.includes(username)) {
+                priceArr.splice(priceArr.length, 0, username);
+                $("#preload" + (i + 1)).attr("src", selected.createUserImage);
+                $("tr.user-img td:nth-child(" + (i + 1) + ") img.circular").attr("src", selected.createUserImage);
+                $("tr.user-name td:nth-child(" + (i + 1) + ")").html(username);
+                $("tr.user-content td:nth-child(" + (i + 1) + ")").html(selected.message);
+                unassignUser(username);
+            } else {
+                processResult(ajaxJson, i); // 重複就重做
+                console.log("duplicate user: " + username);
+            }
+        }
+    </script>
+</body>
+
+</html>
